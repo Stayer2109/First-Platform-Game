@@ -1176,11 +1176,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 881295081760245540, guid: 6299fe7b4339b9848b0c901e5c746f09, type: 3}
       propertyPath: maxFallSpeed
-      value: 50
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 881295081760245540, guid: 6299fe7b4339b9848b0c901e5c746f09, type: 3}
       propertyPath: fallMultiplier
-      value: 0.025
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 881295081760245540, guid: 6299fe7b4339b9848b0c901e5c746f09, type: 3}
       propertyPath: groundLayer.m_Bits
