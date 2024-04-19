@@ -25,8 +25,9 @@ public class PlayerMovement : MonoBehaviour
     public float fallMultiplier = 1.5f;
 
     // JUMP BUFFERING TIME
-    private float jumpBufferTime = 0.2f;
+    private float jumpBufferTime = 0.12f;
     private float jumpBufferCounter;
+
     // JUMP COYOTE TIME
     private float jumpCoyoteTime = 0.2f;
     private float jumpCoyoteCounter;
@@ -73,7 +74,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // ACCELERAT OR DECELERATE PLAYER 
+    // ACCELERAT OR DECELERATE PLAYER
     private void UpdateMovementSpeed()
     {
         // Increase speed to max speed if player is moving
@@ -100,11 +101,19 @@ public class PlayerMovement : MonoBehaviour
         // If player is moving
         if (horizontal != 0)
         {
-            currentSpeedValue = Mathf.MoveTowards(currentSpeedValue, targetSpeedValue, acceleration * Time.deltaTime);
+            currentSpeedValue = Mathf.MoveTowards(
+                currentSpeedValue,
+                targetSpeedValue,
+                acceleration * Time.deltaTime
+            );
         }
         else
         {
-            currentSpeedValue = Mathf.MoveTowards(currentSpeedValue, 0f, deceleration * Time.deltaTime);
+            currentSpeedValue = Mathf.MoveTowards(
+                currentSpeedValue,
+                0f,
+                deceleration * Time.deltaTime
+            );
         }
 
         // Apply new velocity to the player
