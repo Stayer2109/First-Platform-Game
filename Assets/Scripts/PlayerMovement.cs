@@ -16,6 +16,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float jumpForce = 10f;
 
+    [SerializeField]
+    [Range(0, 1)]
+    private float jumpDecay = 0.5f;
+
     // JUMP BUFFERING TIME
     private float jumpBufferTime = 0.12f;
     private float jumpBufferCounter;
@@ -31,8 +35,8 @@ public class PlayerMovement : MonoBehaviour
     public float deceleration = 45f;
 
     [Header("Gravity")]
-    public float fallMultiplier = 1.5f;
-    private Vector2 vecGravity;
+    public float gravityScale = 5f;
+    public float fallGravityScale = 10f;
 
     // CHECKING PLAYER FACING DIRECTION
     private bool facingRight;
@@ -45,7 +49,6 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         facingRight = true;
-        vecGravity = new Vector2(0f, -Physics2D.gravity.y);
     }
 
     // Update is called once per frame
@@ -89,6 +92,11 @@ public class PlayerMovement : MonoBehaviour
     // ACCELERAT OR DECELERATE PLAYER
     private void UpdateMovementSpeed()
     {
+        if (horizontal > 0f && Input.GetButtonDown("Horizontal") || horizontal < 0f && Input.GetButtonDown("Horizontal"))
+        {
+            moveSpeed = 0f;
+        }
+
         // Increase speed to max speed if player is moving
         if (Mathf.Abs(horizontal) > 0f && moveSpeed < maxSpeed)
         {
@@ -146,6 +154,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (context.canceled && rb.velocity.y > 0f)
         {
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpDecay);
             jumpCoyoteCounter = 0f;
         }
     }
@@ -158,9 +167,17 @@ public class PlayerMovement : MonoBehaviour
     // GRAVITY FOR FALLING
     private void Gravity()
     {
-        if (rb.velocity.y < 0)
+        // if (rb.velocity.y < 0)
+        // {
+        //     rb.velocity -= fallMultiplier * Time.deltaTime * vecGravity;
+        // }
+        if (rb.velocity.y >= 0)
         {
-            rb.velocity -= fallMultiplier * Time.deltaTime * vecGravity;
+            rb.gravityScale = gravityScale;
+        }
+        else
+        {
+            rb.gravityScale = fallGravityScale;
         }
     }
 
