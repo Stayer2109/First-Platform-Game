@@ -12,17 +12,9 @@ public class PlayerMovement : MonoBehaviour
     public Transform groundCheck;
     public LayerMask groundLayer;
 
-    [Header("Player Movement")]
-    public float moveSpeed = 8f;
-    public float maxSpeed = 20f;
-    public float acceleration = 38f;
-    public float deceleration = 45f;
-    public float jumpForce = 10f;
-
-    [Header("Gravity")]
-    public float baseGravity = 5f;
-    public float maxFallSpeed = 10f;
-    public float fallMultiplier = 1.5f;
+    [Header("Jumping System")]
+    [SerializeField]
+    private float jumpForce = 10f;
 
     // JUMP BUFFERING TIME
     private float jumpBufferTime = 0.12f;
@@ -32,9 +24,28 @@ public class PlayerMovement : MonoBehaviour
     private float jumpCoyoteTime = 0.2f;
     private float jumpCoyoteCounter;
 
+    [Header("Movement System")]
+    public float moveSpeed = 8f;
+    public float maxSpeed = 20f;
+    public float acceleration = 38f;
+    public float deceleration = 45f;
+
+    [Header("Gravity")]
+    public float fallMultiplier = 1.5f;
+    private Vector2 vecGravity;
+
+    // CHECKING PLAYER FACING DIRECTION
+    private bool facingRight;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+    }
+
+    void Start()
+    {
+        facingRight = true;
+        vecGravity = new Vector2(0f, -Physics2D.gravity.y);
     }
 
     // Update is called once per frame
@@ -42,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
     {
         UpdateMovementSpeed();
         Gravity();
+        Flip();
 
         // Coyote time
         if (IsGrounded())
@@ -134,7 +146,6 @@ public class PlayerMovement : MonoBehaviour
 
         if (context.canceled && rb.velocity.y > 0f)
         {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
             jumpCoyoteCounter = 0f;
         }
     }
@@ -149,14 +160,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (rb.velocity.y < 0)
         {
-            // Scale the gravity to fall faster
-            float targetGravityScale = Mathf.Min(rb.gravityScale + fallMultiplier, maxFallSpeed);
-            rb.gravityScale = targetGravityScale;
-            rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y, -maxFallSpeed));
-        }
-        else
-        {
-            rb.gravityScale = baseGravity;
+            rb.velocity -= fallMultiplier * Time.deltaTime * vecGravity;
         }
     }
 
@@ -166,6 +170,17 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.velocity = Vector2.zero;
             transform.position = Vector3.zero;
+        }
+    }
+
+    private void Flip()
+    {
+        if (facingRight && horizontal < 0 || !facingRight && horizontal > 0)
+        {
+            facingRight = !facingRight;
+            Vector3 scale = transform.localScale;
+            scale.x *= -1;
+            transform.localScale = scale;
         }
     }
 }
