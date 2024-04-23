@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     public Transform groundCheck;
     public LayerMask groundLayer;
+    public ParticleSystem smokeFx;
 
     [Header("Jumping System")]
     [SerializeField]
@@ -72,6 +73,11 @@ public class PlayerMovement : MonoBehaviour
         if (!Input.GetButtonDown("Jump"))
         {
             jumpBufferCounter -= Time.deltaTime;
+        }
+
+        if (CanPlaySmokeFX())
+        {
+            smokeFx.Play();
         }
 
         // Restart player if it falls off the map
@@ -149,6 +155,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (context.performed)
         {
+            smokeFx.Play();
             jumpBufferCounter = jumpBufferTime;
         }
 
@@ -167,16 +174,13 @@ public class PlayerMovement : MonoBehaviour
     // GRAVITY FOR FALLING
     private void Gravity()
     {
-        // if (rb.velocity.y < 0)
-        // {
-        //     rb.velocity -= fallMultiplier * Time.deltaTime * vecGravity;
-        // }
         if (rb.velocity.y >= 0)
         {
             rb.gravityScale = gravityScale;
         }
         else
         {
+            // smokeFx.Play();
             rb.gravityScale = fallGravityScale;
         }
     }
@@ -186,7 +190,7 @@ public class PlayerMovement : MonoBehaviour
         if (transform.position.y < -20f)
         {
             rb.velocity = Vector2.zero;
-            transform.position = Vector3.zero;
+            transform.position = new Vector2(1f, -2f);
         }
     }
 
@@ -199,5 +203,14 @@ public class PlayerMovement : MonoBehaviour
             scale.x *= -1;
             transform.localScale = scale;
         }
+    }
+
+    private bool CanPlaySmokeFX()
+    {
+        if (moveSpeed >= maxSpeed)
+        {
+            return true;
+        }
+        return false;
     }
 }
