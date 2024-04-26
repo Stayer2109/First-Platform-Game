@@ -1,22 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using UnityEditor.ShortcutManagement;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class ObjectSpawner : MonoBehaviour
 {
-    public enum ObjectType { Cheese }
+    public enum ObjectType
+    {
+        Cheese
+    }
+
     public Tilemap tilemap;
     public GameObject[] objectPrefabs;
-    public float cheeseProbability = 0.5f;
     public int maxObjects = 10;
 
-    private List<Vector3> validSpawnPositions = new List<Vector3>();
-    private List<GameObject> spawnObjects = new List<GameObject>();
-    private float spawnInterval = 0.5f;
+    private readonly List<Vector3> validSpawnPositions = new();
+    private readonly List<GameObject> spawnObjects = new();
+    private readonly float spawnInterval = 1f;
     private bool isSpawning = false;
 
     // Start is called before the first frame update
@@ -32,6 +33,10 @@ public class ObjectSpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!isSpawning && ActiveObjectsCount() < maxObjects)
+        {
+            StartCoroutine(SpawnObjectsIfNeeded());
+        }
         // GatherValidPosition();
     }
 
@@ -54,12 +59,15 @@ public class ObjectSpawner : MonoBehaviour
 
     private bool PositionHasObject(Vector3 positionToCheck)
     {
-        return spawnObjects.Any(checkObj => checkObj && Vector3.Distance(checkObj.transform.position, positionToCheck) < 1.0f);
+        return spawnObjects.Any(checkObj =>
+            checkObj && Vector3.Distance(checkObj.transform.position, positionToCheck) < 1.0f
+        );
     }
 
     private void SpawnObject()
     {
-        if (validSpawnPositions.Count == 0) return;
+        if (validSpawnPositions.Count == 0)
+            return;
 
         Vector3 spawnPosition = Vector3.zero;
         bool validPositionFound = false;
@@ -76,14 +84,16 @@ public class ObjectSpawner : MonoBehaviour
                 spawnPosition = potentialPosition;
                 validPositionFound = true;
             }
-
-            validSpawnPositions.RemoveAt(randomIndex);
         }
 
         if (validPositionFound)
         {
             ObjectType objectType = ObjectType.Cheese;
-            GameObject gameObject = Instantiate(objectPrefabs[(int)objectType], spawnPosition, Quaternion.identity);
+            GameObject gameObject = Instantiate(
+                objectPrefabs[(int)objectType],
+                spawnPosition,
+                Quaternion.identity
+            );
             spawnObjects.Add(gameObject);
         }
     }
@@ -103,8 +113,7 @@ public class ObjectSpawner : MonoBehaviour
                 TileBase tile = allTiles[x + y * boundsInt.size.x];
                 if (tile != null)
                 {
-                    Debug.Log(tile);
-                    Vector3 place = start + new Vector3(x + 0.5f, y + 1.8f, 0);
+                    Vector3 place = start + new Vector3(x + 0.5f, y + 1.7f, 0);
                     validSpawnPositions.Add(place);
                 }
             }
